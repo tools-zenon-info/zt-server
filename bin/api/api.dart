@@ -105,9 +105,11 @@ class Api {
     final data = jsonDecode(
         File('${Config.refinerDataStoreDirectory}/pillar_data.json')
             .readAsStringSync()) as Map<String, dynamic>;
-    final statistics30d = jsonDecode(
-        File('${Config.statisticsDirectory}/pillars/statistics/30d.json')
-            .readAsStringSync()) as Map<String, dynamic>;
+    final statsFile = File(
+        '${Config.statisticsDirectory}/pillars/statistics/30d.json');
+    final statistics30d = (statsFile.existsSync()
+        ? jsonDecode(statsFile.readAsStringSync())
+        : <String, dynamic>{}) as Map<String, dynamic>;
 
     final additionalData = await DatabaseService().getPillarInfo();
     final now = (DateTime.now().millisecondsSinceEpoch / 1000).round();
@@ -147,9 +149,9 @@ class Api {
   }
 
   Future<Response> _pillarsOffChainHandler(Request request) async {
-    final data = File(
-            '${Config.pillarsOffChainInfoDirectory}/pillars_off_chain_info.json')
-        .readAsStringSync();
+    final file = File(
+        '${Config.pillarsOffChainInfoDirectory}/pillars_off_chain_info.json');
+    final data = file.existsSync() ? file.readAsStringSync() : '{}';
     return Response.ok(
       data,
       headers: headers,
